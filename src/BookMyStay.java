@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public class BookMyStay {
     public static void main(String[] args) {
         // UC1
@@ -26,6 +29,23 @@ public class BookMyStay {
         System.out.println("\nSuite Room:");
         suiteRoom.displayRoomDetails();
         System.out.println("Available: " + suiteAvailable);
+
+        // UC3
+        RoomInventory inventory = new RoomInventory();
+
+        System.out.println("\nHotel Room Inventory Status");
+
+        System.out.println("\nSingle Room:");
+        singleRoom.displayRoomDetails();
+        System.out.println("Available Rooms: " + inventory.getRoomAvailability().get("Single"));
+
+        System.out.println("\nDouble Room:");
+        doubleRoom.displayRoomDetails();
+        System.out.println("Available Rooms: " + inventory.getRoomAvailability().get("Double"));
+
+        System.out.println("\nSuite Room:");
+        suiteRoom.displayRoomDetails();
+        System.out.println("Available Rooms: " + inventory.getRoomAvailability().get("Suite"));
     }
 }
 
@@ -57,4 +77,23 @@ class DoubleRoom extends Room {
 
 class SuiteRoom extends Room {
     public SuiteRoom() { super(3, 750, 5000.0); }
+}
+
+class RoomInventory {
+    private Map<String, Integer> roomAvailability;
+
+    public RoomInventory() {
+        roomAvailability = new HashMap<>();
+        initializeInventory();
+    }
+
+    private void initializeInventory() {
+        roomAvailability.put("Single", 5);
+        roomAvailability.put("Double", 3);
+        roomAvailability.put("Suite", 2);
+    }
+
+    public Map<String, Integer> getRoomAvailability() { return roomAvailability; }
+
+    public void updateAvailability(String roomType, int count) { roomAvailability.put(roomType, count); }
 }
