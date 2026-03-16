@@ -1,7 +1,9 @@
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 public class BookMyStay {
     public static void main(String[] args) {
@@ -61,7 +63,7 @@ public class BookMyStay {
         BookingRequestQueue bookingQueue = new BookingRequestQueue();
 
         Reservation r1 = new Reservation("Abhi", "Single");
-        Reservation r2 = new Reservation("Subha", "Double");
+        Reservation r2 = new Reservation("Subha", "Single");
         Reservation r3 = new Reservation("Vanmathi", "Suite");
 
         bookingQueue.addRequest(r1);
@@ -71,6 +73,21 @@ public class BookMyStay {
         while (bookingQueue.hasPendingRequests()) {
             Reservation r = bookingQueue.getNextRequest();
             System.out.println("Processing booking for Guest: " + r.getGuestName() + ", Room Type: " + r.getRoomType());
+        }
+
+        // UC6
+        BookingRequestQueue bookingQueue2 = new BookingRequestQueue();
+        bookingQueue2.addRequest(new Reservation("Abhi", "Single"));
+        bookingQueue2.addRequest(new Reservation("Subha", "Single"));
+        bookingQueue2.addRequest(new Reservation("Vanmathi", "Suite"));
+
+        RoomAllocationService allocationService = new RoomAllocationService();
+
+        System.out.println("\nRoom Allocation Processing");
+
+        while (bookingQueue2.hasPendingRequests()) {
+            Reservation r = bookingQueue2.getNextRequest();
+            allocationService.allocateRoom(r, inventory);
         }
     }
 }
@@ -176,4 +193,34 @@ class BookingRequestQueue {
     public Reservation getNextRequest() { return requestQueue.poll(); }
 
     public boolean hasPendingRequests() { return !requestQueue.isEmpty(); }
+}
+
+class RoomAllocationService {
+    private Set<String> allocatedRoomIds;
+    private Map<String, Set<String>> assignedRoomsByType;
+
+    public RoomAllocationService() {
+        allocatedRoomIds = new HashSet<>();
+        assignedRoomsByType = new HashMap<>();
+    }
+
+    public void allocateRoom(Reservation reservation, RoomInventory inventory) {
+        String roomType = reservation.getRoomType();
+        Map<String, Integer> availability = inventory.getRoomAvailability();
+
+        if (availability.getOrDefault(roomType, 0) > 0) {
+            String roomId = generateRoomId(roomType);
+            allocatedRoomIds.add(roomId);
+            assignedRoomsByType.computeIfAbsent(roomType, k -> new HashSet<>()).add(roomId);
+            inventory.updateAvailability(roomType, availability.get(roomType) - 1);
+            System.out.println("Booking confirmed for Guest: " + reservation.getGuestName() + ", Room ID: " + roomId);
+        } else {
+            System.out.println("Booking failed for Guest: " + reservation.getGuestName() + ", Room Type: " + roomType + " not available.");
+        }
+    }
+
+    private String generateRoomId(String roomType) {
+        int count = assignedRoomsByType.getOrDefault(roomType, new HashSet<>()).size() + 1;
+        return roomType + "-" + count;
+    }
 }
