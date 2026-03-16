@@ -46,6 +46,12 @@ public class BookMyStay {
         System.out.println("\nSuite Room:");
         suiteRoom.displayRoomDetails();
         System.out.println("Available Rooms: " + inventory.getRoomAvailability().get("Suite"));
+
+        // UC4
+        RoomSearchService searchService = new RoomSearchService();
+
+        System.out.println("\nRoom Search");
+        searchService.searchAvailableRooms(inventory, singleRoom, doubleRoom, suiteRoom);
     }
 }
 
@@ -96,4 +102,33 @@ class RoomInventory {
     public Map<String, Integer> getRoomAvailability() { return roomAvailability; }
 
     public void updateAvailability(String roomType, int count) { roomAvailability.put(roomType, count); }
+}
+
+class RoomSearchService {
+    public void searchAvailableRooms(
+            RoomInventory inventory,
+            Room singleRoom,
+            Room doubleRoom,
+            Room suiteRoom) {
+
+        Map<String, Integer> availability = inventory.getRoomAvailability();
+
+        if (availability.get("Single") > 0) {
+            System.out.println("\nSingle Room:");
+            singleRoom.displayRoomDetails();
+            System.out.println("Available: " + availability.get("Single"));
+        }
+
+        if (availability.get("Double") > 0) {
+            System.out.println("\nDouble Room:");
+            doubleRoom.displayRoomDetails();
+            System.out.println("Available: " + availability.get("Double"));
+        }
+
+        if (availability.get("Suite") > 0) {
+            System.out.println("\nSuite Room:");
+            suiteRoom.displayRoomDetails();
+            System.out.println("Available: " + availability.get("Suite"));
+        }
+    }
 }
